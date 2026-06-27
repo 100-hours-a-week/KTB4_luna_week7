@@ -12,6 +12,7 @@ const message = document.querySelector("#message");
 const successPopup = document.querySelector("#successPopup");
 const withdrawButton = document.querySelector("#withdrawButton");
 const nicknameHelper = document.querySelector("#nicknameHelper");
+const submitButton = modifyInfoForm.querySelector('button[type="submit"]');
 
 const accessToken = requireLogin();
 const userId = localStorage.getItem("userId");
@@ -26,13 +27,27 @@ function setNicknameHelper(message) {
   nicknameHelper.className = message ? "helper-text error" : "helper-text";
 }
 
+function updateModifyInfoButtonState() {
+  const nickname = nicknameInput.value.trim();
+
+  const isValid = !validateNickname(nickname);
+
+  submitButton.disabled = !isValid;
+}
+
+nicknameInput.addEventListener("input", updateModifyInfoButtonState);
+
 modifyInfoForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const newNickname = nicknameInput.value.trim();
   const newProfileImageUrl = profileImageUrlInput.value.trim();
 
-  if (!validateNickname(newNickname)) {
+  const nicknameMessage = validateNickname(newNickname);
+
+  setNicknameHelper(nicknameMessage);
+
+  if (nicknameMessage) {
     return;
   }
 
@@ -46,8 +61,6 @@ modifyInfoForm.addEventListener("submit", async (event) => {
 
     localStorage.setItem("nickname", newNickname);
     localStorage.setItem("profileImageUrl", newProfileImageUrl);
-
-    message.textContent = result.message;
 
     successPopup.hidden = false;
 
@@ -79,4 +92,6 @@ withdrawButton.addEventListener("click", async()=>{
     } catch(error){
         message.textContent = error.message;
     }
-})
+});
+
+updateModifyInfoButtonState();

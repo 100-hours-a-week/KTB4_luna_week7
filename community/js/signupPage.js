@@ -14,6 +14,7 @@ const emailHelper = document.querySelector("#emailHelper");
 const passwordHelper = document.querySelector("#passwordHelper");
 const passwordConfirmHelper = document.querySelector("#passwordConfirmHelper");
 const nicknameHelper = document.querySelector("#nicknameHelper");
+const submitButton = signupForm.querySelector('button[type="submit"]');
 
 function setMessage(element, message, type) {
   element.textContent = message;
@@ -32,6 +33,26 @@ function clearHelpers() {
   setHelper(nicknameHelper, "");
   signupMessage.textContent = "";
 }
+
+function updateSignupButtonState() {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  const passwordConfirm = passwordConfirmInput.value;
+  const nickname = nicknameInput.value.trim();
+
+  const isValid =
+    !validateEmail(email) &&
+    !validatePassword(password) &&
+    !validatePasswordConfirm(password, passwordConfirm) &&
+    !validateNickname(nickname);
+
+  submitButton.disabled = !isValid;
+}
+
+emailInput.addEventListener("input", updateSignupButtonState);
+passwordInput.addEventListener("input", updateSignupButtonState);
+passwordConfirmInput.addEventListener("input", updateSignupButtonState);
+nicknameInput.addEventListener("input", updateSignupButtonState);
 
 signupForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -75,3 +96,5 @@ signupForm.addEventListener("submit", async (event) => {
     signupMessage.textContent = error.message;
   }
 });
+
+updateSignupButtonState();

@@ -13,6 +13,7 @@ const draftMessage = document.querySelector("#draftMessage");
 
 const saveDraftButton = document.querySelector("#saveDraftButton");
 const deleteDraftButton = document.querySelector("#deleteDraftButton");
+const submitButton = uploadForm.querySelector('button[type="submit"]');
 
 const titleInput= uploadForm.elements.title;
 const postBodyInput = uploadForm.elements.postBody;
@@ -31,6 +32,18 @@ function getPostFormValues(){
     };
 }
 
+titleInput.addEventListener("input", updatePostCreateButtonState);
+postBodyInput.addEventListener("input", updatePostCreateButtonState);
+
+function updatePostCreateButtonState() {
+  const title = titleInput.value.trim();
+  const postBody = postBodyInput.value.trim();
+
+  const isValid = title && postBody;
+
+  submitButton.disabled = !isValid;
+}
+
 async function loadCurrentDraft(){
     try{
         const result = await getCurrentDraft({accessToken});
@@ -43,6 +56,8 @@ async function loadCurrentDraft(){
         titleInput.value = draft.title || "";
         postBodyInput.value = draft.postBody || "";
         postImageUrlInput.value = draft.postImageUrl || "";
+
+        updatePostCreateButtonState();
 
         deleteDraftButton.hidden= false;
         draftMessage.textContent = "임시저장된 글을 불러왔습니다.";
@@ -124,3 +139,4 @@ uploadForm.addEventListener("submit", async (event) => {
 });
 
 loadCurrentDraft();
+updatePostCreateButtonState();

@@ -8,6 +8,7 @@ const passwordInput = document.querySelector("#password");
 const passwordConfirmInput = document.querySelector("#passwordConfirm");
 const passwordHelper = document.querySelector("#passwordHelper");
 const passwordConfirmHelper = document.querySelector("#passwordConfirmHelper");
+const submitButton = modifyPwForm.querySelector('button[type="submit"]');
 
 const message = document.querySelector("#message");
 const successPopup = document.querySelector("#successPopup");
@@ -28,6 +29,20 @@ function clearHelpers() {
   setHelper(passwordConfirmHelper, "");
   message.textContent = "";
 }
+
+function updatePasswordButtonState() {
+  const password = passwordInput.value;
+  const passwordConfirm = passwordConfirmInput.value;
+
+  const isValid =
+    !validatePassword(password) &&
+    !validatePasswordConfirm(password, passwordConfirm);
+
+  submitButton.disabled = !isValid;
+}
+
+passwordInput.addEventListener("input", updatePasswordButtonState);
+passwordConfirmInput.addEventListener("input", updatePasswordButtonState);
 
 modifyPwForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -62,8 +77,6 @@ modifyPwForm.addEventListener("submit", async (event) => {
       passwordConfirm: newPasswordConfirm,
     });
 
-    message.textContent = result.message;
-
     successPopup.hidden = false;
 
     setTimeout(() => {
@@ -75,3 +88,4 @@ modifyPwForm.addEventListener("submit", async (event) => {
 });
 
 renderHeader();
+updatePasswordButtonState();

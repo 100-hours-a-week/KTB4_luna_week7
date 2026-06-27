@@ -20,6 +20,7 @@ const commentCount = document.querySelector("#commentCount");
 
 const commentForm = document.querySelector("#commentForm");
 const commentBodyInput = document.querySelector("#commentBody");
+const commentSubmitButton = commentForm.querySelector('button[type="submit"]');
 
 const commentList = document.querySelector("#commentList");
 
@@ -67,6 +68,14 @@ likeButton.addEventListener("click", async () => {
   }
 });
 
+function updateCommentButtonState() {
+  const commentBody = commentBodyInput.value.trim();
+
+  commentSubmitButton.disabled = !commentBody;
+}
+
+commentBodyInput.addEventListener("input", updateCommentButtonState);
+
 commentForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const commentBody = commentBodyInput.value.trim();
@@ -84,6 +93,7 @@ commentForm.addEventListener("submit", async (event) => {
     });
 
     commentBodyInput.value = "";
+    updateCommentButtonState();
 
     await loadCommentList();
     await loadPostDetail();
@@ -371,6 +381,8 @@ function renderCommentList(data) {
       const author = item.author;
       const comment = item.comment;
       const isOwner = author.nickname === loginNickname;
+      const isDeleted = comment.deleted === true;
+      const canModify = isOwner && !isDeleted;
 
       return `
         <article class="comment-item" data-comment-id="${comment.commentId}">
@@ -385,7 +397,7 @@ function renderCommentList(data) {
           <p class="comment-body">${comment.commentBody}</p>
           <small>${formatDateTime(comment.createdAt) || ""}</small>
 
-          ${isOwner
+          ${canModify
           ? `
                 <div class="comment-actions">
                   <button type="button" class="comment-edit-button">수정</button>
@@ -415,3 +427,4 @@ async function loadCommentList() {
 renderReportReasonOptions();
 loadPostDetail();
 loadCommentList();
+updateCommentButtonState();

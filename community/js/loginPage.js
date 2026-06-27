@@ -15,6 +15,7 @@ const passwordInput = loginForm.elements.password;
 
 const emailHelper = document.querySelector("#emailHelper");
 const passwordHelper = document.querySelector("#passwordHelper");
+const submitButton = loginForm.querySelector('button[type="submit"]');
 
 function setHelper(element, message) {
   element.textContent = message;
@@ -25,6 +26,20 @@ function clearHelpers() {
   setHelper(emailHelper, "");
   setHelper(passwordHelper, "");
   loginMessage.textContent = "";
+}
+
+emailInput.addEventListener("input", updateLoginButtonState);
+passwordInput.addEventListener("input", updateLoginButtonState);
+
+function updateLoginButtonState() {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+
+  const isValid =
+    !validateEmail(email) &&
+    !validatePassword(password);
+
+  submitButton.disabled = !isValid;
 }
 
 loginForm.addEventListener("submit", async (event) => {
@@ -62,7 +77,9 @@ loginForm.addEventListener("submit", async (event) => {
 
     window.location.href = "./postList.html";
   } catch (error) {
-    
+
     loginMessage.textContent = "아이디 또는 비밀번호를 확인해주세요.";
   }
 });
+
+updateLoginButtonState();

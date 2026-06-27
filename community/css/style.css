@@ -401,3 +401,12 @@ button[type="submit"] {
 .message.success {
   color: #2e7d32;
 }
+
+button[type="submit"] {
+  background-color: #7F6AEE;
+}
+
+button[type="submit"]:disabled {
+  background-color: #ACA0EB;
+  opacity: 1;
+}
