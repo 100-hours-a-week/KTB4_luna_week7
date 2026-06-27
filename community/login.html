@@ -10,9 +10,11 @@
   <main class="auth-container">
     <h1>로그인</h1>
 
-    <form id="loginForm">
-      <input name="email" type="email" placeholder="이메일" required />
-      <input name="password" type="password" placeholder="비밀번호" required />
+    <form id="loginForm" novalidate>
+      <input name="email" type="email" placeholder="이메일" />
+      <p id="emailHelper" class="helper-text"></p>
+      <input name="password" type="password" placeholder="비밀번호" />
+      <p id="passwordHelper" class="helper-text"></p>
       <button type="submit">로그인</button>
     </form>
 

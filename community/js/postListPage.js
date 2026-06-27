@@ -13,6 +13,24 @@ postWriteButton.addEventListener("click", () => {
     window.location.href = "./postCreate.html";
 });
 
+function formatDateTime(createdAt) {
+  if (!createdAt) return "";
+
+  return createdAt
+    .replace("T", " ")
+    .slice(0, 19);
+}
+
+function formatCount(count) {
+  const number = Number(count) || 0;
+
+  if (number >= 1000) {
+    return `${Math.floor(number / 1000)}k`;
+  }
+
+  return `${number}`;
+}
+
 function renderPostItem(item) {
     const author = item.author;
     const post = item.post;
@@ -26,10 +44,10 @@ function renderPostItem(item) {
         <h2>${post.title}</h2>
 
         <div class="post-meta">
-          <span>좋아요 ${post.likes}</span>
-          <span>댓글 ${post.comments}</span>
-          <span>조회수 ${post.views}</span>
-          <span>${post.createdAt}</span>
+          <span>좋아요 ${formatCount(post.likes)}</span>
+          <span>댓글 ${formatCount(post.comments)}</span>
+          <span>조회수 ${formatCount(post.views)}</span>
+          <span>${formatDateTime(post.createdAt)}</span>
         </div>
 
         <div class="author">

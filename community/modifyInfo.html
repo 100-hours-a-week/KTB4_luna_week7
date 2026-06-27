@@ -12,10 +12,11 @@
     <h1>회원정보 수정</h1>
   </header>
   <main>
-    <form id="modifyInfoForm">
+    <form id="modifyInfoForm" novalidate>
       <div>
         <label for="nickname">닉네임</label>
-        <input id="nickname" name="nickname" type="text" required />
+        <input id="nickname" name="nickname" type="text" />
+        <p id="nicknameHelper" class="helper-text"></p>
       </div>
 
       <div>

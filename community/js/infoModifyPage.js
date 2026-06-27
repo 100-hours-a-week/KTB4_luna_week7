@@ -1,6 +1,7 @@
 import { modifyInfo, withdrawn } from "../services/userApi.js";
 import { renderHeader } from "../components/header.js";
 import { requireLogin } from "../utils/auth.js";
+import { validateNickname } from "../utils/validation.js";
 
 renderHeader();
 
@@ -10,23 +11,32 @@ const profileImageUrlInput = document.querySelector("#profileImageUrl");
 const message = document.querySelector("#message");
 const successPopup = document.querySelector("#successPopup");
 const withdrawButton = document.querySelector("#withdrawButton");
+const nicknameHelper = document.querySelector("#nicknameHelper");
 
 const accessToken = requireLogin();
 const userId = localStorage.getItem("userId");
 const nickname = localStorage.getItem("nickname");
 const profileImageUrl = localStorage.getItem("profileImageUrl");
 
-
 nicknameInput.value = nickname || "";
 profileImageUrlInput.value = profileImageUrl || "";
+
+function setNicknameHelper(message) {
+  nicknameHelper.textContent = message;
+  nicknameHelper.className = message ? "helper-text error" : "helper-text";
+}
 
 modifyInfoForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  try {
-    const newNickname = nicknameInput.value.trim();
-    const newProfileImageUrl = profileImageUrlInput.value.trim();
+  const newNickname = nicknameInput.value.trim();
+  const newProfileImageUrl = profileImageUrlInput.value.trim();
 
+  if (!validateNickname(newNickname)) {
+    return;
+  }
+
+  try {
     const result = await modifyInfo({
       userId,
       accessToken,
@@ -45,6 +55,11 @@ modifyInfoForm.addEventListener("submit", async (event) => {
       successPopup.hidden = true;
     }, 1200);
   } catch (error) {
+    if (error.status === 409 || error.message.includes("409")) {
+      setNicknameHelper("중복된 닉네임입니다");
+      return;
+    }
+
     message.textContent = error.message;
   }
 });

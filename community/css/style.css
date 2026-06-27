@@ -376,3 +376,28 @@ button[type="submit"] {
 #reportCancelButton {
   background: #777;
 }
+
+.error-message {
+  color: #e53935;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.helper-text {
+  min-height: 18px;
+  margin: 4px 0 10px;
+  font-size: 12px;
+  color: #777;
+}
+
+.helper-text.error {
+  color: #e53935;
+}
+
+.message.error {
+  color: #e53935;
+}
+
+.message.success {
+  color: #2e7d32;
+}

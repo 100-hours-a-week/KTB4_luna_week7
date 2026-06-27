@@ -1,31 +1,77 @@
 import { signup } from "../services/userApi.js";
+import { validateEmail, validateNickname, validatePassword, validatePasswordConfirm } from "../utils/validation.js";
 
 const signupForm = document.querySelector("#signupForm");
 const signupMessage = document.querySelector("#signupMessage");
 
+const emailInput = signupForm.elements.email;
+const passwordInput = signupForm.elements.password;
+const passwordConfirmInput = signupForm.elements.passwordConfirm;
+const nicknameInput = signupForm.elements.nickname;
+const profileImageUrlInput = signupForm.elements.profileImageUrl;
+
+const emailHelper = document.querySelector("#emailHelper");
+const passwordHelper = document.querySelector("#passwordHelper");
+const passwordConfirmHelper = document.querySelector("#passwordConfirmHelper");
+const nicknameHelper = document.querySelector("#nicknameHelper");
+
 function setMessage(element, message, type) {
-    element.textContent = message;
-    element.className = `message ${type}`;
+  element.textContent = message;
+  element.className = `message ${type}`;
+}
+
+function setHelper(element, message) {
+  element.textContent = message;
+  element.className = message ? "helper-text error" : "helper-text";
+}
+
+function clearHelpers() {
+  setHelper(emailHelper, "");
+  setHelper(passwordHelper, "");
+  setHelper(passwordConfirmHelper, "");
+  setHelper(nicknameHelper, "");
+  signupMessage.textContent = "";
 }
 
 signupForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  clearHelpers();
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  const passwordConfirm = passwordConfirmInput.value;
+  const nickname = nicknameInput.value.trim();
+  const profileImageUrl = profileImageUrlInput.value.trim();
 
-  const formData = new FormData(signupForm);
-  const values = Object.fromEntries(formData);
+  const emailMessage = validateEmail(email);
+  const passwordMessage = validatePassword(password);
+  const passwordConfirmMessage = validatePasswordConfirm(password, passwordConfirm);
+  const nicknameMessage = validateNickname(nickname);
+
+  if (emailMessage) setHelper(emailHelper, emailMessage);
+  if (passwordMessage) setHelper(passwordHelper, passwordMessage);
+  if (passwordConfirmMessage) setHelper(passwordConfirmHelper, passwordConfirmMessage);
+  if (nicknameMessage) setHelper(nicknameHelper, nicknameMessage);
+  if (emailMessage || passwordMessage || passwordConfirmMessage || nicknameMessage) {
+    return;
+  }
 
   try {
     const result = await signup({
-      email: values.email,
-      password: values.password,
-      passwordConfirm: values.passwordConfirm,
-      nickname : values.nickname,
-      profileImageUrl : values.profileImageUrl
+      email: email,
+      password: password,
+      passwordConfirm: passwordConfirm,
+      nickname: nickname,
+      profileImageUrl: profileImageUrl
     });
     setMessage(signupMessage, result.message || "회원가입 성공", "success");
     signupForm.reset();
     window.location.href = "./login.html";
   } catch (error) {
+    if (error.status === 409) {
+      setHelper(emailHelper, "이메일 또는 닉네임 중 중복되는 값이 있습니다.");
+      setHelper(nicknameHelper, "이메일 또는 닉네임 중 중복되는 값이 있습니다.");
+      return;
+    }
     signupMessage.textContent = error.message;
   }
 });

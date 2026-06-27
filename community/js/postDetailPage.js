@@ -9,11 +9,6 @@ const loginNickname = localStorage.getItem("nickname");
 
 renderHeader();
 
-if (!postId) {
-  alert("게시글 ID가 없습니다.");
-  window.location.href = "./postList.html";
-}
-
 const postDetail = document.querySelector("#postDetail");
 const message = document.querySelector("#message");
 
@@ -39,6 +34,12 @@ var currentLikes = 0;
 
 const params = new URLSearchParams(window.location.search);
 const postId = params.get("postId");
+
+if (!postId) {
+  alert("게시글 ID가 없습니다.");
+  window.location.href = "./postList.html";
+}
+
 
 likeButton.addEventListener("click", async () => {
   try {
@@ -124,7 +125,7 @@ commentList.addEventListener("click", async (event) => {
 
 
 function updateLikeButton() {
-  likeCount.textContent = currentLikes;
+  likeCount.textContent = formatCount(currentLikes);
   if (currentLiked) {
     likeText.textContent = "좋아요 취소";
     likeButton.classList.add("active");
@@ -145,6 +146,24 @@ function renderReportReasonOptions() {
 
     reportReason.appendChild(option);
   });
+}
+
+function formatDateTime(createdAt) {
+  if (!createdAt) return "";
+
+  return String(createdAt)
+    .replace("T", " ")
+    .slice(0, 19);
+}
+
+function formatCount(count) {
+  const number = Number(count) || 0;
+
+  if (number >= 1000) {
+    return `${Math.floor(number / 1000)}k`;
+  }
+
+  return `${number}`;
 }
 
 reportOpenButton.addEventListener("click", () => {
@@ -191,6 +210,35 @@ reportForm.addEventListener("submit", async (event) => {
   }
 });
 
+function bindPostOwnerButtons() {
+  const postModifyButton = document.querySelector("#postModifyButton");
+  const postDeleteButton = document.querySelector("#postDeleteButton");
+
+  postModifyButton.addEventListener("click", () => {
+    window.location.href = `./postModify.html?postId=${postId}`;
+  });
+
+  postDeleteButton.addEventListener("click", async () => {
+    const confirmed = confirm("게시글을 삭제하시겠습니까?");
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const result = await deletePost({
+        accessToken,
+        postId,
+      });
+
+      alert(result.message);
+      window.location.href = "./postList.html";
+    } catch (error) {
+      message.textContent = error.message;
+    }
+  });
+}
+
 function renderPostDetail(data) {
   const author = data.author;
   const post = data.post;
@@ -222,9 +270,9 @@ function renderPostDetail(data) {
       ? `<img src="${author.profileImageUrl}" alt="프로필 이미지" width="40" height="40" />`
       : ""
     }
-      <p>작성일: ${post.createdAt}</p>
-      <p>조회수: ${meta.views}</p>
-      <p>댓글: ${meta.comments}</p>
+      <p>작성일: ${formatDateTime(post.createdAt)}</p>
+      <p>조회수: ${formatCount(meta.views)}</p>
+      <p>댓글: ${formatCount(meta.comments)}</p>
     </section>
 
     <section>
@@ -232,43 +280,14 @@ function renderPostDetail(data) {
     </section>
   `;
 
-  likeCount.textContent = currentLikes;
-  viewCount.textContent = meta.views;
-  commentCount.textContent = meta.comments;
+  likeCount.textContent = formatCount(currentLikes);
+  viewCount.textContent = formatCount(meta.views);
+  commentCount.textContent = formatCount(meta.comments);
   updateLikeButton();
 
   if (isOwner) {
     bindPostOwnerButtons();
   }
-}
-
-function bindPostOwnerButtons() {
-  const postModifyButton = document.querySelector("#postModifyButton");
-  const postDeleteButton = document.querySelector("#postDeleteButton");
-
-  postModifyButton.addEventListener("click", () => {
-    window.location.href = `./postModify.html?postId=${postId}`;
-  });
-
-  postDeleteButton.addEventListener("click", async () => {
-    const confirmed = confirm("게시글을 삭제하시겠습니까?");
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      const result = await deletePost({
-        accessToken,
-        postId,
-      });
-
-      alert(result.message);
-      window.location.href = "./postList.html";
-    } catch (error) {
-      message.textContent = error.message;
-    }
-  });
 }
 
 async function loadPostDetail() {
@@ -364,7 +383,7 @@ function renderCommentList(data) {
           </div>
 
           <p class="comment-body">${comment.commentBody}</p>
-          <small>${comment.createdAt || ""}</small>
+          <small>${formatDateTime(comment.createdAt) || ""}</small>
 
           ${isOwner
           ? `
