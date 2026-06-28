@@ -1,6 +1,7 @@
 import { login } from "../services/userApi.js";
 import { redirectIfLoggedIn } from "../utils/auth.js";
 import { validateEmail, validatePassword } from "../utils/validation.js";
+import { setHelper, clearHelpers } from "../utils/formHelper.js";
 
 // 만약 로그인 되어있는 유저라면, 로그인 화면이 아니라 다른 화면(게시글 페이지 등 기본 설정)으로 이동. => 공통 함수로 변경.
 // const accessToken = localStorage.getItem("accessToken");
@@ -16,17 +17,6 @@ const passwordInput = loginForm.elements.password;
 const emailHelper = document.querySelector("#emailHelper");
 const passwordHelper = document.querySelector("#passwordHelper");
 const submitButton = loginForm.querySelector('button[type="submit"]');
-
-function setHelper(element, message) {
-  element.textContent = message;
-  element.className = message ? "helper-text error" : "helper-text";
-}
-
-function clearHelpers() {
-  setHelper(emailHelper, "");
-  setHelper(passwordHelper, "");
-  loginMessage.textContent = "";
-}
 
 emailInput.addEventListener("input", updateLoginButtonState);
 passwordInput.addEventListener("input", updateLoginButtonState);
@@ -48,7 +38,7 @@ loginForm.addEventListener("submit", async (event) => {
   const email = emailInput.value.trim();
   const password = passwordInput.value;
 
-  clearHelpers();
+  clearHelpers(emailHelper, passwordHelper);
 
   const emailMessage = validateEmail(email);
   const passwordMessage = validatePassword(password);

@@ -60,9 +60,6 @@ modifyPostForm.addEventListener("submit", async (event) => {
             postBody,
             postImageUrl,
         });
-
-        modifyMessage.textContent = result.message || "게시글 수정 완료";
-
         window.location.href = `./postDetail.html?postId=${postId}`;
     } catch (error) {
         modifyMessage.textContent = error.message;

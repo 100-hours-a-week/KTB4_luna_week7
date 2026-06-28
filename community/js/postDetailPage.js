@@ -2,6 +2,7 @@ import { renderHeader } from "../components/header.js";
 import { getCommentList, postComment, modifyComment, deleteComment } from "../services/commentApi.js";
 import { deletePost, getPostDetail, likePost, unlikePost, reportPost } from "../services/postApi.js";
 import { requireLogin } from "../utils/auth.js";
+import { formatCount, formatDateTime } from "../utils/format.js";
 import { ReportReason, ReportReasonLabel } from "../components/reportReason.js";
 
 const accessToken = requireLogin();
@@ -39,6 +40,7 @@ const postId = params.get("postId");
 if (!postId) {
   alert("게시글 ID가 없습니다.");
   window.location.href = "./postList.html";
+  throw new Error("게시글 ID가 없습니다.");
 }
 
 
@@ -86,7 +88,7 @@ commentForm.addEventListener("submit", async (event) => {
   }
 
   try {
-    const result = await postComment({
+    await postComment({
       accessToken: accessToken,
       postId: postId,
       commentBody: commentBody,
@@ -156,24 +158,6 @@ function renderReportReasonOptions() {
 
     reportReason.appendChild(option);
   });
-}
-
-function formatDateTime(createdAt) {
-  if (!createdAt) return "";
-
-  return String(createdAt)
-    .replace("T", " ")
-    .slice(0, 19);
-}
-
-function formatCount(count) {
-  const number = Number(count) || 0;
-
-  if (number >= 1000) {
-    return `${Math.floor(number / 1000)}k`;
-  }
-
-  return `${number}`;
 }
 
 reportOpenButton.addEventListener("click", () => {

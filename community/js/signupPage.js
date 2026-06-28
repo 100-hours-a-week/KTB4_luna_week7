@@ -1,5 +1,6 @@
 import { signup } from "../services/userApi.js";
 import { validateEmail, validateNickname, validatePassword, validatePasswordConfirm } from "../utils/validation.js";
+import { setHelper, clearHelpers, setMessage } from "../utils/formHelper.js";
 
 const signupForm = document.querySelector("#signupForm");
 const signupMessage = document.querySelector("#signupMessage");
@@ -15,24 +16,6 @@ const passwordHelper = document.querySelector("#passwordHelper");
 const passwordConfirmHelper = document.querySelector("#passwordConfirmHelper");
 const nicknameHelper = document.querySelector("#nicknameHelper");
 const submitButton = signupForm.querySelector('button[type="submit"]');
-
-function setMessage(element, message, type) {
-  element.textContent = message;
-  element.className = `message ${type}`;
-}
-
-function setHelper(element, message) {
-  element.textContent = message;
-  element.className = message ? "helper-text error" : "helper-text";
-}
-
-function clearHelpers() {
-  setHelper(emailHelper, "");
-  setHelper(passwordHelper, "");
-  setHelper(passwordConfirmHelper, "");
-  setHelper(nicknameHelper, "");
-  signupMessage.textContent = "";
-}
 
 function updateSignupButtonState() {
   const email = emailInput.value.trim();
@@ -56,7 +39,8 @@ nicknameInput.addEventListener("input", updateSignupButtonState);
 
 signupForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  clearHelpers();
+  clearHelpers(emailHelper, passwordHelper, passwordConfirmHelper, nicknameHelper);
+  signupMessage.textContent = "";
   const email = emailInput.value.trim();
   const password = passwordInput.value;
   const passwordConfirm = passwordConfirmInput.value;
@@ -84,7 +68,6 @@ signupForm.addEventListener("submit", async (event) => {
       nickname: nickname,
       profileImageUrl: profileImageUrl
     });
-    setMessage(signupMessage, result.message || "회원가입 성공", "success");
     signupForm.reset();
     window.location.href = "./login.html";
   } catch (error) {

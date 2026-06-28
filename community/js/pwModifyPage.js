@@ -2,6 +2,7 @@ import { modifyPassword } from "../services/userApi.js";
 import { renderHeader } from "../components/header.js";
 import { requireLogin } from "../utils/auth.js";
 import { validatePassword, validatePasswordConfirm } from "../utils/validation.js";
+import { setHelper, clearHelpers } from "../utils/formHelper.js";
 
 const modifyPwForm = document.querySelector("#modifyPwForm");
 const passwordInput = document.querySelector("#password");
@@ -18,17 +19,6 @@ const userId = localStorage.getItem("userId");
 
 passwordInput.value = "";
 passwordConfirmInput.value = "";
-
-function setHelper(element, message) {
-  element.textContent = message;
-  element.className = message ? "helper-text error" : "helper-text";
-}
-
-function clearHelpers() {
-  setHelper(passwordHelper, "");
-  setHelper(passwordConfirmHelper, "");
-  message.textContent = "";
-}
 
 function updatePasswordButtonState() {
   const password = passwordInput.value;
@@ -49,7 +39,13 @@ modifyPwForm.addEventListener("submit", async (event) => {
   const newPassword = passwordInput.value;
   const newPasswordConfirm = passwordConfirmInput.value;
 
-  clearHelpers();
+  clearHelpers(
+    emailHelper,
+    passwordHelper,
+    passwordConfirmHelper,
+    nicknameHelper
+  );
+  signupMessage.textContent = "";
 
   const passwordMessage = validatePassword(newPassword);
   const passwordConfirmMessage = validatePasswordConfirm(

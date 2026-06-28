@@ -1,6 +1,7 @@
 import { renderHeader } from "../components/header.js";
 import { getPostList } from "../services/postApi.js";
 import { requireLogin } from "../utils/auth.js";
+import { formatDateTime, formatCount } from "../utils/format.js";
 
 const accessToken = requireLogin();
 renderHeader();
@@ -12,24 +13,6 @@ const postWriteButton = document.querySelector("#postWriteButton");
 postWriteButton.addEventListener("click", () => {
     window.location.href = "./postCreate.html";
 });
-
-function formatDateTime(createdAt) {
-  if (!createdAt) return "";
-
-  return createdAt
-    .replace("T", " ")
-    .slice(0, 19);
-}
-
-function formatCount(count) {
-  const number = Number(count) || 0;
-
-  if (number >= 1000) {
-    return `${Math.floor(number / 1000)}k`;
-  }
-
-  return `${number}`;
-}
 
 function renderPostItem(item) {
     const author = item.author;

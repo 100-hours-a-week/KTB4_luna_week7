@@ -2,6 +2,7 @@ import { modifyInfo, withdrawn } from "../services/userApi.js";
 import { renderHeader } from "../components/header.js";
 import { requireLogin } from "../utils/auth.js";
 import { validateNickname } from "../utils/validation.js";
+import { setHelper } from "../utils/formHelper.js";
 
 renderHeader();
 
@@ -22,11 +23,6 @@ const profileImageUrl = localStorage.getItem("profileImageUrl");
 nicknameInput.value = nickname || "";
 profileImageUrlInput.value = profileImageUrl || "";
 
-function setNicknameHelper(message) {
-  nicknameHelper.textContent = message;
-  nicknameHelper.className = message ? "helper-text error" : "helper-text";
-}
-
 function updateModifyInfoButtonState() {
   const nickname = nicknameInput.value.trim();
 
@@ -45,7 +41,7 @@ modifyInfoForm.addEventListener("submit", async (event) => {
 
   const nicknameMessage = validateNickname(newNickname);
 
-  setNicknameHelper(nicknameMessage);
+  setHelper(nicknameHelper, nicknameMessage);
 
   if (nicknameMessage) {
     return;
@@ -69,10 +65,9 @@ modifyInfoForm.addEventListener("submit", async (event) => {
     }, 1200);
   } catch (error) {
     if (error.status === 409 || error.message.includes("409")) {
-      setNicknameHelper("중복된 닉네임입니다");
+      setHelper(nicknameHelper, "중복된 닉네임입니다");
       return;
     }
-
     message.textContent = error.message;
   }
 });

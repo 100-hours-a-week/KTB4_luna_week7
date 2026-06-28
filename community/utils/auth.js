@@ -18,7 +18,7 @@ export function requireLogin() {
     if (!accessToken) {
         alert("로그인이 필요합니다.");
         window.location.href = "./login.html";
-        return null;
+        throw new Error("로그인이 필요합니다.");
     }
 
     return accessToken;
